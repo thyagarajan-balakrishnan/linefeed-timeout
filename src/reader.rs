@@ -128,6 +128,8 @@ pub enum ReadResult {
     Input(String),
     /// Reported signal was received
     Signal(Signal),
+    /// Timed out waiting for user input
+    TimedOut,
 }
 
 #[derive(Copy, Clone, Debug)]
@@ -242,6 +244,8 @@ impl<'a, Term: 'a + Terminal> Reader<'a, Term> {
 
         if do_read {
             self.lock.read_input()?;
+        } else {
+            return Ok(Some(ReadResult::TimedOut));
         }
 
         if let Some(size) = self.lock.take_resize() {
