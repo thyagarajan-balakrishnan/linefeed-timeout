@@ -244,8 +244,6 @@ impl<'a, Term: 'a + Terminal> Reader<'a, Term> {
 
         if do_read {
             self.lock.read_input()?;
-        } else {
-            return Ok(Some(ReadResult::TimedOut));
         }
 
         if let Some(size) = self.lock.take_resize() {
@@ -259,6 +257,10 @@ impl<'a, Term: 'a + Terminal> Reader<'a, Term> {
             if !self.lock.ignore_signals.contains(sig) {
                 self.handle_signal(sig)?;
             }
+        }
+
+        if !do_read {
+            return Ok(Some(ReadResult::TimedOut));
         }
 
         // Acquire the write lock and process all available input
